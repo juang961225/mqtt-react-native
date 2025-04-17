@@ -1,109 +1,154 @@
-import { StyleSheet, Image, Platform } from 'react-native';
+import React from 'react';
+import { StyleSheet, View, ScrollView, Text, Dimensions, Platform } from 'react-native';
+import { VictoryBar, VictoryChart, VictoryTheme, VictoryLine } from 'victory-native';
+import {
+  VictoryBar as WebVictoryBar,
+  VictoryChart as WebVictoryChart,
+  VictoryLine as WebVictoryLine,
+  VictoryTheme as WebVictoryTheme,
+} from 'victory';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+const screenWidth = Dimensions.get('window').width;
+
+const coffeeData = {
+  espresso: 5,
+  americano: 3,
+  latte: 7,
+  capuccino: 4,
+  mocha: 2,
+  macchiato: 6,
+};
+
+const temperature = 22;
+
+const coffeeByDay = [
+  { day: 'Lun', count: 3 },
+  { day: 'Mar', count: 4 },
+  { day: 'Mié', count: 6 },
+  { day: 'Jue', count: 2 },
+  { day: 'Vie', count: 5 },
+  { day: 'Sáb', count: 4 },
+  { day: 'Dom', count: 7 },
+];
+
+const coffeeByHour = [
+  { hour: '8am', count: 1 },
+  { hour: '10am', count: 3 },
+  { hour: '12pm', count: 2 },
+  { hour: '2pm', count: 4 },
+  { hour: '4pm', count: 2 },
+  { hour: '6pm', count: 1 },
+];
 
 export default function TabTwoScreen() {
+  const BarChart = Platform.OS === 'web' ? WebVictoryBar : VictoryBar;
+  const LineChart = Platform.OS === 'web' ? WebVictoryLine : VictoryLine;
+  const Chart = Platform.OS === 'web' ? WebVictoryChart : VictoryChart;
+  const theme = Platform.OS === 'web' ? WebVictoryTheme.material : VictoryTheme.material;
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>☕ Café Tracker</Text>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Tipos de café</Text>
+        {Object.entries(coffeeData).map(([type, count]) => (
+          <Text key={type} style={styles.itemText}>
+            {type.charAt(0).toUpperCase() + type.slice(1)}: {count}
+          </Text>
+        ))}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>🌡️ Temperatura actual</Text>
+        <Text style={styles.temp}>{temperature}°C</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Café por día</Text>
+        <Chart
+          width={screenWidth - 32}
+          height={220}
+          theme={theme}
+          domainPadding={20}
+        >
+          <BarChart
+            data={coffeeByDay}
+            x="day"
+            y="count"
+            animate={{ duration: 800, easing: 'bounce' }}
+            style={{
+              data: {
+                fill: '#A9715E',
+                width: 20,
+                borderTopLeftRadius: 4,
+                borderTopRightRadius: 4,
+              },
+            }}
+          />
+        </Chart>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Café por hora</Text>
+        <Chart
+          width={screenWidth - 32}
+          height={220}
+          theme={theme}
+        >
+          <LineChart
+            data={coffeeByHour}
+            x="hour"
+            y="count"
+            animate={{ duration: 1000, easing: 'linear' }}
+            style={{
+              data: { stroke: '#4A3F35', strokeWidth: 3 },
+              parent: { border: '1px solid #ccc' },
+            }}
+          />
+        </Chart>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    padding: 16,
+    backgroundColor: '#FAF3E0', // Tono latte
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  title: {
+    fontSize: 28,
+    fontWeight: '600',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#4A3F35',
+  },
+  section: {
+    marginBottom: 30,
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '500',
+    marginBottom: 8,
+    color: '#7B6D63',
+  },
+  itemText: {
+    fontSize: 16,
+    color: '#4A3F35',
+    paddingVertical: 2,
+  },
+  temp: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#D2691E',
+    textAlign: 'center',
   },
 });
