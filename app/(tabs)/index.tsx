@@ -21,7 +21,7 @@ export default function HomeScreen() {
   const [response, setResponse] = useState<string | null>(null); // Para almacenar la respuesta "sí" o "no"
 
   // Cambiar el broker público por la IP local del ESP32
-  const MQTT_BROKER = 'ws://192.168.1.1:8080/';
+  const MQTT_BROKER = 's://192.168.1.188:8080/';
 
   useEffect(() => {
     const mqttClient = mqtt.connect(MQTT_BROKER);
